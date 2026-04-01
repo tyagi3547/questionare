@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tense Traveler: The Grammar Quest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 95%;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .btn-fancy {
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        }
+
+        .btn-fancy:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(0,0,0,0.2);
+        }
+
+        .option-btn {
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s;
+            text-align: left;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+        }
+
+        .correct {
+            background-color: #48bb78 !important;
+            color: white !important;
+            border-color: #38a169 !important;
+        }
+
+        .wrong {
+            background-color: #f56565 !important;
+            color: white !important;
+            border-color: #e53e3e !important;
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container" class="glass-panel text-center relative overflow-hidden">
+        
+        <div id="screen-start">
+            <div class="mb-6">
+                <svg class="mx-auto w-24 h-24 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Tense Traveler</h1>
+            <p class="text-gray-600 mb-8 text-lg">Fix the broken timeline by choosing the correct tenses!</p>
+            <button onclick="showLevels()" class="btn-fancy bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-full text-xl w-full sm:w-auto">
+                START MISSION
+            </button>
+        </div>
+
+        <div id="screen-levels" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Choose Your Time Zone</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="startQuiz('present')" class="btn-fancy bg-green-500 hover:bg-green-600 text-white p-6 rounded-2xl text-left">
+                    <div class="text-3xl mb-2">🌱</div>
+                    <div class="font-bold">The Present</div>
+                </button>
+                <button onclick="startQuiz('past')" class="btn-fancy bg-orange-500 hover:bg-orange-600 text-white p-6 rounded-2xl text-left">
+                    <div class="text-3xl mb-2">🏛️</div>
+                    <div class="font-bold">The Past</div>
+                </button>
+                <button onclick="startQuiz('future')" class="btn-fancy bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-2xl text-left">
+                    <div class="text-3xl mb-2">🚀</div>
+                    <div class="font-bold">The Future</div>
+                </button>
+                <button onclick="startQuiz('mixed')" class="btn-fancy bg-purple-500 hover:bg-purple-600 text-white p-6 rounded-2xl text-left">
+                    <div class="text-3xl mb-2">🌀</div>
+                    <div class="font-bold">Timeline Chaos</div>
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-quiz" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <span id="level-badge" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold uppercase">Present</span>
+                <div class="font-bold text-gray-700">Score: <span id="score">0</span></div>
+            </div>
+            <div id="question-box" class="mb-8">
+                <h3 id="question-text" class="text-2xl font-semibold text-gray-800 leading-snug">Question goes here...</h3>
+            </div>
+            <div id="options-container" class="grid grid-cols-1 gap-3"></div>
+            <div id="feedback" class="mt-6 min-h-[1.5rem] font-bold text-lg"></div>
+            <button id="next-btn" onclick="nextQuestion()" class="hidden mt-8 btn-fancy bg-gray-800 text-white font-bold py-3 px-8 rounded-full">NEXT →</button>
+        </div>
+
+        <div id="screen-results" class="hidden">
+            <div class="text-6xl mb-4">🏆</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Mission Complete!</h2>
+            <p id="result-text" class="text-gray-600 mb-8 font-medium"></p>
+            <button onclick="showLevels()" class="btn-fancy bg-indigo-600 text-white font-bold py-4 px-10 rounded-full">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = {
+            present: [
+                { q: "Listen! The birds ___ in the garden.", options: ["sing", "is singing", "are singing"], correct: 2 },
+                { q: "My father usually ___ to work by car.", options: ["goes", "go", "is going"], correct: 0 }
+            ],
+            past: [
+                { q: "I ___ my keys on the table yesterday.", options: ["leave", "leaved", "left"], correct: 2 },
+                { q: "Did you ___ the new movie last night?", options: ["see", "saw", "seen"], correct: 0 }
+            ],
+            future: [
+                { q: "I think it ___ tomorrow.", options: ["is raining", "will rain", "rains"], correct: 1 },
+                { q: "Look at those clouds! It ___ rain.", options: ["is going to", "will", "goes to"], correct: 0 }
+            ],
+            mixed: [
+                { q: "Last year I ___ to Paris.", options: ["go", "went", "have gone"], correct: 1 },
+                { q: "Look! The cat ___ over the fence.", options: ["jumps", "is jumping", "jumped"], correct: 1 }
+            ]
+        };
+
+        let currentCategory = '';
+        let currentIdx = 0;
+        let score = 0;
+        let canAnswer = true;
+
+        function showLevels() {
+            hideAll();
+            document.getElementById('screen-levels').classList.remove('hidden');
+        }
+
+        function hideAll() {
+            ['screen-start', 'screen-levels', 'screen-quiz', 'screen-results'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        }
+
+        function startQuiz(cat) {
+            currentCategory = cat;
+            currentIdx = 0;
+            score = 0;
+            hideAll();
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            canAnswer = true;
+            const qData = questions[currentCategory][currentIdx];
+            document.getElementById('question-text').innerText = qData.q;
+            document.getElementById('feedback').innerText = '';
+            document.getElementById('next-btn').classList.add('hidden');
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            qData.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => check(i);
+                container.appendChild(btn);
+            });
+        }
+
+        function check(idx) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            const qData = questions[currentCategory][currentIdx];
+            const btns = document.querySelectorAll('.option-btn');
+            if (idx === qData.correct) {
+                btns[idx].classList.add('correct');
+                score++;
+                document.getElementById('score').innerText = score;
+            } else {
+                btns[idx].classList.add('wrong');
+                btns[qData.correct].classList.add('correct');
+                document.getElementById('game-container').classList.add('shake');
+                setTimeout(() => document.getElementById('game-container').classList.remove('shake'), 500);
+            }
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < questions[currentCategory].length) loadQuestion();
+            else showResults();
+        }
+
+        function showResults() {
+            hideAll();
+            document.getElementById('screen-results').classList.remove('hidden');
+            document.getElementById('result-text').innerText = `You scored ${score}/${questions[currentCategory].length}!`;
+        }
+    </script>
+</body>
+</html>
